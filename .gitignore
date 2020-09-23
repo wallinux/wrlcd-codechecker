@@ -1,5 +1,6 @@
 out
 .stamps
 meta-codechecker
+codechecker
 hostconfig-ltscd_ubuntu-20_04.eprime.com.mk
 *~
