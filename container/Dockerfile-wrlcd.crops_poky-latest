@@ -1,0 +1,14 @@
+FROM crops/poky:latest
+MAINTAINER Anders Wallin
+
+WORKDIR /root
+
+USER root
+ENV TERM xterm
+ENV DEBIAN_FRONTEND noninteractive
+
+RUN apt-get update
+RUN apt-get install -y locales tzdata cpio
+RUN apt-get install -y moreutils bc bsdmainutils rsync lsb-release
+
+ENTRYPOINT ["/bin/sh"]
