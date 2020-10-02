@@ -94,12 +94,12 @@ codechecker.update: $(CODECHECKER_DIR) # update codechecker layer
 	$(GIT) -C $< checkout $(CODECHECKER_BRANCH) &> /dev/null || git checkout -b $(CODECHECKER_BRANCH) origin/$(CODECHECKER_BRANCH)
 	$(GIT) -C $< pull
 
-codechecker.enable:
+codechecker.enable: # enable codechecker
 	$(TRACE)
 	$(MAKE) codechecker.add_layer
 	$(MAKE) codechecker.configure
 
-codechecker.disable:
+codechecker.disable: # disable codechecker
 	$(TRACE)
 	$(MAKE) codechecker.deconfigure
 	$(MAKE) codechecker.remove_layer
