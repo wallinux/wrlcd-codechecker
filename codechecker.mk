@@ -2,7 +2,7 @@
 
 ##CODECHECKER_REPO	= git@github.com:dl9pf/meta-codechecker.git
 CODECHECKER_REPO	= git@github.com:wallinux/meta-codechecker.git
-CODECHECKER_DIR		= $(GITROOT)/layers/meta-codechecker
+CODECHECKER_DIR		= $(TOP)/layers/meta-codechecker
 CODECHECKER_BRANCH	?= master
 
 CODECHECKER_PORT	?= 8002

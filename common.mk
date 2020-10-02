@@ -12,7 +12,6 @@ export TERM	:= xterm
 -include userconfig-$(USER).mk
 
 TOP		:= $(shell pwd)
-GITROOT		= $(shell git rev-parse --show-toplevel)
 
 # Define V=1 to echo everything
 ifneq ($(V),1)

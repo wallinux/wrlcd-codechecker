@@ -37,7 +37,7 @@ define run-container-exec
 endef
 
 CONTAINER_MOUNTS	+= -v $(WRL_INSTALL_DIR):$(WRL_INSTALL_DIR):ro
-CONTAINER_MOUNTS	+= -v $(GITROOT):$(GITROOT)
+CONTAINER_MOUNTS	+= -v $(TOP):$(TOP)
 CONTAINER_MOUNTS	+= -v $(HOME):$(HOME)
 
 CONTAINER_NAME_RUNNING	= $(eval container_name_running=$(shell $(CONTAINER) inspect -f {{.State.Running}} $(CONTAINER_NAME)))
@@ -51,13 +51,13 @@ endif
 
 .PHONY:: container.* hostconfig-$(CONTAINER_HOSTNAME).mk
 
-container.build: $(GITROOT)/container/Dockerfile-$(CONTAINER_TAG).$(CONTAINER_DT) # build container image
+container.build: $(TOP)/container/Dockerfile-$(CONTAINER_TAG).$(CONTAINER_DT) # build container image
 	$(TRACE)
 ifneq ($(V),1)
 	$(eval quiet=-q)
 endif
 	$(MCONTAINER) build $(quiet) $(CONTAINER_BUILDARGS) --pull -f $< \
-		-t "$(CONTAINER_IMAGE)" $(GITROOT)/container
+		-t "$(CONTAINER_IMAGE)" $(TOP)/container
 
 container.prepare.ubuntu::
 	$(TRACE)
