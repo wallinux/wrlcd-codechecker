@@ -19,8 +19,6 @@ WRL_OPTS	+= --distros $(DISTRO)
 WRL_OPTS	+= --base-branch $(WRL_BRANCH)
 WRL_OPTS	+= --machines $(MACHINE)
 
--include $(OUT_DIR)/wrlinux_version
-
 ######################################################################################
 BBPREP		= $(CD) $(OUT_DIR); \
 		  source ./environment-setup-x86_64-wrlinuxsdk-linux; \
@@ -41,7 +39,6 @@ Makefile.help::
 	$(call run-help, Makefile)
 	$(GREEN)
 	$(ECHO) " WRL_INSTALL_DIR: $(WRL_INSTALL_DIR)"
-	$(ECHO) " WRLINUX_VERSION: $(WRLINUX_VERSION)"
 	$(ECHO) " MACHINE: $(MACHINE)"
 	$(ECHO) " KERNEL_TYPE: $(KERNEL_TYPE)"
 	$(ECHO) " IMAGE: $(IMAGE)"
@@ -52,10 +49,6 @@ list-machines: setup # list-machines
 	$(TRACE)
 	$(CD) $(OUT_DIR); ./wrlinux-x/setup.sh --$@
 
-wrlinux_version:
-	$(TRACE)
-	$(Q)sed '/^WRLINUX_/!d' $(OUT_DIR)/layers/wrlinux/conf/wrlinux-version.inc | grep _VERSION | head -n -1 | tr -d ' ' > $(OUT_DIR)/$@
-
 setup: $(OUT_DIR) # setup wrlinux CD
 $(OUT_DIR):
 	$(TRACE)
@@ -63,7 +56,6 @@ $(OUT_DIR):
 	$(CD) $@ ; \
 		git clone --branch $(WRL_BRANCH) $(WRL_INSTALL_DIR)/wrlinux-x wrlinux-x; \
 		REPO_MIRROR_LOCATION=$(WRL_INSTALL_DIR)	./wrlinux-x/setup.sh $(WRL_OPTS);
-	$(MAKE) wrlinux_version
 
 configure:: $(BUILD_DIR)  # configure wrlinux CD machine build directory
 $(BUILD_DIR): | $(OUT_DIR)
@@ -82,11 +74,11 @@ $(BUILD_DIR): | $(OUT_DIR)
 	fi
 	$(ECHO) "SSTATE_DIR = \"$(OUT_DIR)/sstate-cache\"" >> $(BUILD_DIR)/conf/local.conf
 
-kernel: | $(BUILD_DIR) # build kernel
+pkg.%: | $(BUILD_DIR) # build package %
 	$(TRACE)
-	$(Q)$(call bitbake-task, virtual/kernel, configure)
+	$(Q)$(call bitbake, $*)
 
-bbs: | $(BUILD_DIR)
+bbs: | $(BUILD_DIR) # start bitbake shell
 	$(CD) $(OUT_DIR) ; \
 		source ./environment-setup-x86_64-wrlinuxsdk-linux ; \
 		source ./oe-init-build-env $(BUILD_DIR) > /dev/null; \

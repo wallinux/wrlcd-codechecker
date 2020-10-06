@@ -1,6 +1,5 @@
 # container.mk
 
-CROPS			?= 1
 CONTAINER		?= docker
 
 #################################################################
@@ -8,18 +7,13 @@ CONTAINER		?= docker
 docker.%: # make container.% with docker 
 	$(MAKE) container.$* CONTAINER=docker
 
-podman.%:  # make container.% with podman
-	$(MAKE) container.$* CONTAINER=podman
+#podman.%:  # make container.% with podman
+#	$(MAKE) container.$* CONTAINER=podman
 
 #################################################################
 
-ifdef CROPS
- CONTAINER_DISTRO	?= crops_poky
- CONTAINER_DISTRO_VER	?= latest
-else
- CONTAINER_DISTRO	?= ubuntu
- CONTAINER_DISTRO_VER	?= 18_04
-endif
+CONTAINER_DISTRO	?= crops_poky
+CONTAINER_DISTRO_VER	?= latest
 
 CONTAINER_TAG		?= wrlcd
 CONTAINER_DT		?= $(CONTAINER_DISTRO)-$(CONTAINER_DISTRO_VER)
@@ -28,12 +22,11 @@ CONTAINER_IMAGE_REPO	?= $(USER)_$(CONTAINER_DISTRO)_$(CONTAINER_DISTRO_VER)
 CONTAINER_IMAGE		?= $(CONTAINER_IMAGE_REPO):$(CONTAINER_TAG)
 CONTAINER_HOSTNAME	?= $(CONTAINER_TAG)_$(CONTAINER_DT).eprime.com
 #CONTAINER_BUILDARGS	?= --no-cache
-HOSTIP			?= $(shell /sbin/ifconfig docker0 | sed -En 's/127.0.0.1//;s/.*inet (addr:)?(([0-9]*\.){3}[0-9]*).*/\2/p')
 
 MCONTAINER		?= $(Q)$(CONTAINER)
 
 define run-container-exec
-	$(MCONTAINER) exec -e HOSTIP=$(HOSTIP) -u $(1) $(2) $(CONTAINER_NAME) $(3)
+	$(MCONTAINER) exec -u $(1) $(2) $(CONTAINER_NAME) $(3)
 endef
 
 CONTAINER_MOUNTS	+= -v $(WRL_INSTALL_DIR):$(WRL_INSTALL_DIR):ro

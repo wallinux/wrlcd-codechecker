@@ -6,12 +6,7 @@ CODECHECKER_DIR		= $(TOP)/layers/meta-codechecker
 CODECHECKER_BRANCH	?= master
 
 CODECHECKER_PORT	?= 8002
-
-ifdef INSIDE_CONTAINER
-CODECHECKER_IP		?= $(HOSTIP)
-else
 CODECHECKER_IP		?= localhost
-endif
 
 #######################################################################
 
@@ -56,7 +51,7 @@ ifeq ($(V),1)
 	@cat $(ccconf)
 endif
 
-codechecker.deconfigure: $(CODECHECKER_DIR) # remove configuration files
+codechecker.deconfigure: # remove codechecker configuration
 	$(TRACE)
 	$(eval localconf=$(BUILD_DIR)/conf/local.conf)
 	$(eval ccconf=$(BUILD_DIR)/conf/codechecker.conf)

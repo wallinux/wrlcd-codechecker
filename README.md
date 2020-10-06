@@ -1,10 +1,10 @@
-# wrlcd-build
+# wrlcd-codechecker build
 
 Build wrlinuxCD with the static code analyser CodeChecker.
 The results are stored on a CodeChecker webserver running at localhost:8002
 
 ## Prerequisites:
-* wrlinuxcd installed
+* wrlinux CD installed
 * docker installed and working as non-root user
 
 
