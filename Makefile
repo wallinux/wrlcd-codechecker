@@ -62,7 +62,7 @@ $(OUT_DIR):
 		git clone --branch $(WRL_BRANCH) $(WRL_INSTALL_DIR)/wrlinux-x wrlinux-x; \
 		REPO_MIRROR_LOCATION=$(WRL_INSTALL_DIR)	./wrlinux-x/setup.sh $(WRL_OPTS);
 
-$(BUILD_DIR):
+$(BUILD_DIR): | $(OUT_DIR)
 	$(TRACE)
 	$(BBPREP)
 
