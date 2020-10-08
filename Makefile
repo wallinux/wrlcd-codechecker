@@ -25,11 +25,16 @@ BBPREP		= $(CD) $(OUT_DIR); \
 		  source ./oe-init-build-env $(BUILD_DIR) > /dev/null;
 
 define bitbake
-	$(BBPREP) bitbake $(1)
+	$(BBPREP) bitbake $(BBARGS) $(1)
 endef
 
 define bitbake-task
-	$(BBPREP) bitbake $(1) -c $(2)
+	$(BBPREP) bitbake $(BBARGS) -c $(2) $(1)
+endef
+
+define bitbake-rebuild
+	$(BBPREP) bitbake $(BBARGS) -c cleanall $(1)
+	$(BBPREP) bitbake $(BBARGS) $(1)
 endef
 
 ######################################################################################
@@ -57,26 +62,41 @@ $(OUT_DIR):
 		git clone --branch $(WRL_BRANCH) $(WRL_INSTALL_DIR)/wrlinux-x wrlinux-x; \
 		REPO_MIRROR_LOCATION=$(WRL_INSTALL_DIR)	./wrlinux-x/setup.sh $(WRL_OPTS);
 
-configure:: $(BUILD_DIR)  # configure wrlinux CD machine build directory
-$(BUILD_DIR): | $(OUT_DIR)
+$(BUILD_DIR):
 	$(TRACE)
-	$(CD) $(OUT_DIR) ; \
-		source ./environment-setup-x86_64-wrlinuxsdk-linux; \
-		source ./oe-init-build-env $@ > /dev/null; \
-		echo "MACHINE = \"$(MACHINE)\"" >> conf/local.conf
+	$(BBPREP)
+
+Makefile.configure:: # configure wrlinux machine build directory
+	$(TRACE)
+	$(MAKE) $(BUILD_DIR)
+	$(eval localconf=$(BUILD_DIR)/conf/local.conf)
+	$(SED) s/^MACHINE.*/MACHINE\ =\ \"$(MACHINE)\"/g $(localconf)
 	$(IF) [ "$(KERNEL_TYPE)" == "preempt_rt" ]; then \
-		grep -q KTYPE_ENABLED $(BUILD_DIR)/conf/local.conf; \
+		grep -q KTYPE_ENABLED $(localconf); \
 		if [ $$? = 1 ]; then \
-			echo -e "\nKTYPE_ENABLED = \"preempt-rt\"" >> $(BUILD_DIR)/conf/local.conf; \
-			echo -e "LINUX_KERNEL_TYPE = \"preempt-rt\"" >> $(BUILD_DIR)/conf/local.conf; \
-			echo -e "PREFERRED_PROVIDER_virtual/kernel = \"linux-yocto-rt\"" >> $(BUILD_DIR)/conf/local.conf; \
+			echo -e "\nKTYPE_ENABLED = \"preempt-rt\"" >> $(localconf); \
+			echo -e "LINUX_KERNEL_TYPE = \"preempt-rt\"" >> $(localconf); \
+			echo -e "PREFERRED_PROVIDER_virtual/kernel = \"linux-yocto-rt\"" >> $(localconf); \
 		fi \
 	fi
-	$(ECHO) "SSTATE_DIR = \"$(OUT_DIR)/sstate-cache\"" >> $(BUILD_DIR)/conf/local.conf
+ifneq ($(BB_NUMBER_THREADS),)
+	$(GREP) -q "BB_NUMBER_THREADS" $(localconf) || \
+		echo "BB_NUMBER_THREADS = \"$(BB_NUMBER_THREADS)\"" >> $(localconf)
+endif
+ifneq ($(PARALLEL_MAKE),)
+	$(GREP) -q "PARALLEL_MAKE" $(localconf) || \
+		echo "PARALLEL_MAKE = \"$(PARALLEL_MAKE)\"" >> $(localconf)
+endif
+	$(GREP) -q "SKIP_META_GNOME_SANITY_CHECK" $(localconf) || \
+		echo "SKIP_META_GNOME_SANITY_CHECK = \"1\"" >> $(localconf)
+	$(ECHO) "SSTATE_DIR = \"$(OUT_DIR)/sstate-cache\"" >> $(localconf)
+	$(ECHO) "SKIP_META_GNOME_SANITY_CHECK = \"1\"" >> $(localconf)
+
+configure:: Makefile.configure
 
 pkg.%: | $(BUILD_DIR) # build package %
 	$(TRACE)
-	$(Q)$(call bitbake, $*)
+	$(call bitbake-rebuild, $*)
 
 bbs: | $(BUILD_DIR) # start bitbake shell
 	$(CD) $(OUT_DIR) ; \

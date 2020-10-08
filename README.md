@@ -44,10 +44,6 @@ WRL_INSTALL_DIR	= /opt/projects/ericsson/installs/wrlinux_ltsCD
 
 3. Do step 3-6 in Build steps
 
-
-### Podman build
-- Not tested/working
-
 ## References:
 - https://github.com/Ericsson/codechecker
 - https://github.com/Ericsson/codechecker/blob/master/docs/web/docker.md

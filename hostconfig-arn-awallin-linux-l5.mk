@@ -6,11 +6,14 @@ WRL_INSTALL_DIR	= /opt/projects/ericsson/installs/wrlinux_ltsCD
 # Define to trace cmd's
 # V=1
 
+BB_NUMBER_THREADS       = 2
+PARALLEL_MAKE 	  	= -j 4
 OUT_DIR			= /opt/awallin/$(shell basename $(PWD))
 CONTAINER_MOUNTS	+= -v $(OUT_DIR):$(OUT_DIR)
 
 arn-awallin-linux-l5.configure: $(OUT_DIR)
 	$(TRACE)
-	$(Q)ln -sn $(OUT_DIR) $(TOP)/out
+	$(Q)ln -sfn $(OUT_DIR) $(TOP)/out
 
-configure:: arn-awallin-linux-l5.configure
+configure::
+	$(MAKE) arn-awallin-linux-l5.configure

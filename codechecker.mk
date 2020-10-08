@@ -44,7 +44,8 @@ codechecker.configure: $(BUILD_DIR) $(CODECHECKER_DIR) # allow network download 
 	$(ECHO) "THIRD_PARTY_DL_IGNORED_RECIPES += \"python3-thrift\"" >> $(ccconf)
 	$(ECHO) "INHERIT += \"codechecker\"" >> $(ccconf)
 	$(ECHO) "CODECHECKER_ENABLED = \"1\"" >> $(ccconf)
-	$(ECHO) "CODECHECKER_REPORT_HTML = \"1\""  >> $(ccconf)
+#	$(ECHO) "CODECHECKER_ANALYZE_ARGS = \"--ctu -e sensitive\"" >> $(ccconf)
+#	$(ECHO) "CODECHECKER_REPORT_HTML = \"1\""  >> $(ccconf)
 	$(ECHO) "CODECHECKER_REPORT_STORE = \"1\""  >> $(ccconf)
 	$(ECHO) "CODECHECKER_REPORT_HOST = \"http://$(CODECHECKER_IP):$(CODECHECKER_PORT)/Default\"" >> $(ccconf)
 ifeq ($(V),1)
@@ -55,8 +56,8 @@ codechecker.deconfigure: # remove codechecker configuration
 	$(TRACE)
 	$(eval localconf=$(BUILD_DIR)/conf/local.conf)
 	$(eval ccconf=$(BUILD_DIR)/conf/codechecker.conf)
-	$(RM) $(ccconf)
-	$(SED) '/codechecker/d' $(localconf)
+	-$(RM) $(ccconf)
+	-$(SED) '/codechecker.conf/d' $(localconf)
 
 # NOT WORKING, running it manually works fine
 #codechecker.add_layer: $(CODECHECKER_DIR)# add codechecker layer

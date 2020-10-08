@@ -12,8 +12,11 @@ docker.%: # make container.% with docker
 
 #################################################################
 
-CONTAINER_DISTRO	?= crops_poky
-CONTAINER_DISTRO_VER	?= latest
+#CONTAINER_DISTRO	?= crops_poky
+#CONTAINER_DISTRO_VER	?= latest
+
+CONTAINER_DISTRO	?= windriver
+CONTAINER_DISTRO_VER	?= ubuntu1804_64
 
 CONTAINER_TAG		?= wrlcd
 CONTAINER_DT		?= $(CONTAINER_DISTRO)-$(CONTAINER_DISTRO_VER)
@@ -52,22 +55,25 @@ endif
 	$(MCONTAINER) build $(quiet) $(CONTAINER_BUILDARGS) --pull -f $< \
 		-t "$(CONTAINER_IMAGE)" $(TOP)/container
 
-container.prepare.ubuntu::
+container.prepare.crops_poky:
 	$(TRACE)
-	$(eval host_timezone=$(shell cat /etc/timezone))
-	$(call run-container-exec, root, , sh -c "echo $(host_timezone) > /etc/timezone" )
-	$(call run-container-exec, root, , ln -sfn /usr/share/zoneinfo/$(host_timezone) /etc/localtime )
-	$(call run-container-exec, root, , dpkg-reconfigure -f noninteractive tzdata 2> /dev/null)
-	$(call run-container-exec, root, , sh -c "ln -sfn /bin/bash /bin/sh" )
 
-container.prepare.crops_poky:: container.prepare.ubuntu
+container.prepare.windriver:
+	$(TRACE)
+	$(call run-container-exec, root, , deluser -f --remove-home wrlbuild )
+	$(call run-container-exec, root, , delgroup users )
+	$(call run-container-exec, root, , sh -c "echo \"$(USER) ALL=(ALL) NOPASSWD: ALL\" >> /etc/sudoers" )
 
 container.prepare:
 	$(TRACE)
 	$(MCONTAINER) start $(CONTAINER_NAME) $(DEVNULL)
-	$(call run-container-exec, root, , groupadd -f -g $(shell id -g) $(shell id -gn) )
-	$(call run-container-exec, root, , useradd --shell /bin/sh -M -d $(HOME) -u $(shell id -u) $(USER) -g $(shell id -g) )
+	$(eval host_timezone=$(shell cat /etc/timezone))
+	$(call run-container-exec, root, , sh -c "echo $(host_timezone) > /etc/timezone" )
+	$(call run-container-exec, root, , ln -sfn /usr/share/zoneinfo/$(host_timezone) /etc/localtime )
+	$(call run-container-exec, root, , dpkg-reconfigure -f noninteractive tzdata 2> /dev/null)
 	$(MAKE) container.prepare.$(CONTAINER_DISTRO)
+	$(call run-container-exec, root, , groupadd -f -g $(shell id -g) $(shell id -gn) )
+	$(call run-container-exec, root, , useradd --shell /bin/bash -M -d $(HOME) -u $(shell id -u) $(USER) -g $(shell id -g) )
 	$(MAKE) container.stop
 
 CONTAINER_OPTS ?= --ipc host --net host --privileged
