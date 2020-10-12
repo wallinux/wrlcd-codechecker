@@ -19,6 +19,9 @@ WRL_OPTS	+= --distros $(DISTRO)
 WRL_OPTS	+= --base-branch $(WRL_BRANCH)
 WRL_OPTS	+= --machines $(MACHINE)
 
+BB_NUMBER_THREADS ?= $(shell expr $$(nproc --all) / 2)
+PARALLEL_MAKE     ?= -j $(shell expr $$(nproc --all) / 1)
+
 ######################################################################################
 BBPREP		= $(CD) $(OUT_DIR); \
 		  source ./environment-setup-x86_64-wrlinuxsdk-linux; \
@@ -49,6 +52,10 @@ Makefile.help::
 	$(ECHO) " IMAGE: $(IMAGE)"
 
 help:: Makefile.help
+
+all: # Make everything
+	$(TRACE)
+	$(MAKE) image
 
 list-machines: setup # list-machines
 	$(TRACE)
@@ -89,8 +96,8 @@ ifneq ($(PARALLEL_MAKE),)
 endif
 	$(GREP) -q "SKIP_META_GNOME_SANITY_CHECK" $(localconf) || \
 		echo "SKIP_META_GNOME_SANITY_CHECK = \"1\"" >> $(localconf)
-	$(ECHO) "SSTATE_DIR = \"$(OUT_DIR)/sstate-cache\"" >> $(localconf)
-	$(ECHO) "SKIP_META_GNOME_SANITY_CHECK = \"1\"" >> $(localconf)
+	$(GREP) -q "^SSTATE_DIR" $(localconf) || \
+		echo "SSTATE_DIR = \"$(OUT_DIR)/sstate-cache\"" >> $(localconf)
 
 configure:: Makefile.configure
 

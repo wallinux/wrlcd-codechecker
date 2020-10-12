@@ -1,12 +1,14 @@
 # codechecker.mk
 
-##CODECHECKER_REPO	= git@github.com:dl9pf/meta-codechecker.git
+#CODECHECKER_REPO	= git@github.com:dl9pf/meta-codechecker.git
 CODECHECKER_REPO	= git@github.com:wallinux/meta-codechecker.git
 CODECHECKER_DIR		= $(TOP)/layers/meta-codechecker
 CODECHECKER_BRANCH	?= master
 
 CODECHECKER_PORT	?= 8002
 CODECHECKER_IP		?= localhost
+
+CODECHECKER_SKIPFILE	?= $(TOP)/codechecker.skipfile
 
 #######################################################################
 
@@ -44,7 +46,8 @@ codechecker.configure: $(BUILD_DIR) $(CODECHECKER_DIR) # allow network download 
 	$(ECHO) "THIRD_PARTY_DL_IGNORED_RECIPES += \"python3-thrift\"" >> $(ccconf)
 	$(ECHO) "INHERIT += \"codechecker\"" >> $(ccconf)
 	$(ECHO) "CODECHECKER_ENABLED = \"1\"" >> $(ccconf)
-#	$(ECHO) "CODECHECKER_ANALYZE_ARGS = \"--ctu -e sensitive\"" >> $(ccconf)
+	$(ECHO) "CODECHECKER_ANALYZE_ARGS = \"--clean --skip $(CODECHECKER_SKIPFILE) --keep-gcc-include-fixed\"" >> $(ccconf)
+#	$(ECHO) "CODECHECKER_ANALYZE_ARGS = \"--clean --keep-gcc-include-fixed --ctu -e sensitive\"" >> $(ccconf)
 #	$(ECHO) "CODECHECKER_REPORT_HTML = \"1\""  >> $(ccconf)
 	$(ECHO) "CODECHECKER_REPORT_STORE = \"1\""  >> $(ccconf)
 	$(ECHO) "CODECHECKER_REPORT_HOST = \"http://$(CODECHECKER_IP):$(CODECHECKER_PORT)/Default\"" >> $(ccconf)
