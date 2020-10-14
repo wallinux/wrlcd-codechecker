@@ -3,7 +3,7 @@
 CODECHECKER_WORKSPACE	?= $(TOP)/codechecker
 CODECHECKER_REL		?= latest
 CODECHECKER_IMAGE	?= codechecker/codechecker-web:$(CODECHECKER_REL)
-CODECHECKER_CONTAINER	?= wrlcd_codechecker
+CODECHECKER_CONTAINER	?= wrl$(WRL_VER)_codechecker
 
 CODECHECKER_ID		= $(eval codechecker_id=$(shell $(CONTAINER) ps -a -q -f name=$(CODECHECKER_CONTAINER)))
 

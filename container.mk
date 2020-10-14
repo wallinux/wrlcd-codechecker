@@ -18,7 +18,7 @@ docker.%: # make container.% with docker
 CONTAINER_DISTRO	?= windriver
 CONTAINER_DISTRO_VER	?= ubuntu1804_64
 
-CONTAINER_TAG		?= wrlcd
+CONTAINER_TAG		?= wrl$(WRL_VER)
 CONTAINER_DT		?= $(CONTAINER_DISTRO)-$(CONTAINER_DISTRO_VER)
 CONTAINER_NAME		?= $(USER)_$(CONTAINER_TAG)_$(CONTAINER_DT)
 CONTAINER_IMAGE_REPO	?= $(USER)_$(CONTAINER_DISTRO)_$(CONTAINER_DISTRO_VER)
@@ -47,7 +47,7 @@ endif
 
 .PHONY:: container.* hostconfig-$(CONTAINER_HOSTNAME).mk
 
-container.build: $(TOP)/container/Dockerfile-$(CONTAINER_TAG).$(CONTAINER_DT) # build container image
+container.build: $(TOP)/container/Dockerfile.$(CONTAINER_DT) # build container image
 	$(TRACE)
 ifneq ($(V),1)
 	$(eval quiet=-q)

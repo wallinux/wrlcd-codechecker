@@ -10,7 +10,8 @@ IMAGE		?= wrlinux-image-small
 OUT_DIR		?= $(TOP)/out
 BUILD_DIR	?= $(OUT_DIR)/build_$(MACHINE)_$(KERNEL_TYPE)
 
-WRL_INSTALL_DIR ?= /wr/installs/wrl-CD-mirror
+WRL_VER		?= 18
+WRL_INSTALL_DIR ?= /wr/installs/wrl-$(WRL_VER)-mirror
 WRL_BRANCH	?= WRLINUX_CI
 
 WRL_OPTS	+= --dl-layers
